@@ -1,0 +1,47 @@
+services:
+  channel-service-api:
+    image: channel_service_api
+    container_name: ${SERVICE_NAME}-api
+    ports:
+      - ${SERVICE_PORT}:3000
+    volumes:
+      - ./:/app
+    build:
+      args:
+        - MIGRATE_VERSION=${MIGRATE_VERSION}
+      context: .
+      dockerfile: Dockerfile.local
+    environment:
+      - SCYLLA_HOST=${SCYLLA_HOST}
+      - SCYLLA_PORT=${SCYLLA_PORT}
+      - SCYLLA_KEYSPACE=${SCYLLA_KEYSPACE}
+
+  channel-service-scylla:
+    image: scylladb/scylla:5.4
+    restart: always
+    container_name: ${SERVICE_NAME}-scylla
+    command: --api-address 0.0.0.0
+    volumes:
+      - scylla_data:/var/lib/scylla
+      - ./src/scylladb/scripts/initialize.cql:/initialize.cql
+      - 3011:9042
+  # channel-service-db-scylla2:
+  #   image: scylladb/scylla:5.4
+  #   restart: always
+  #   container_name: ${SERVICE_NAME}-scylla2
+  #   command: --seeds=some-scylla --api-address 0.0.0.0
+  #   volumes:
+  #     - scylla_data:/var/lib/scylla
+
+  # channel-service-db-scylla3:
+  #   image: scylladb/scylla:5.4
+  #   restart: always
+  #   container_name: ${SERVICE_NAME}-scylla3
+  #   command: --seeds=some-scylla --api-address 0.0.0.0
+  #   volumes:
+  #     - scylla_data:/var/lib/scylla
+
+volumes:
+  scylla_data:
+
+

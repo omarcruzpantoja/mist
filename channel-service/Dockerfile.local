@@ -1,0 +1,27 @@
+FROM golang:1.22.2-bookworm
+
+ARG MIGRATE_VERSION
+
+ENV PROJECT_DIR=/app \
+    GO111MODULE=on \
+    CGO_ENABLED=0
+
+WORKDIR /app
+
+# install dependencies
+COPY go.mod go.sum /app/
+RUN go mod download
+
+# Copy source code
+COPY ./src ./app/src
+
+# Install migrate for DB migrations
+RUN go install -tags "cassandra" github.com/golang-migrate/migrate/v4/cmd/migrate@${MIGRATE_VERSION}
+
+# Install linter for go
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.58.1
+
+# For hot reload
+RUN go install -mod=mod github.com/githubnemo/CompileDaemon
+
+ENTRYPOINT CompileDaemon --build="go build /app/src/main.go" -command="./main -routes=true"
