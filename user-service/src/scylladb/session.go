@@ -2,9 +2,9 @@ package scylladb
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gocql/gocql"
 	"github.com/scylladb/gocqlx/v2"
@@ -12,9 +12,9 @@ import (
 
 func InitializeScyllaConnection() *gocql.ClusterConfig {
 	// Get the ScyllaDB connection details from the environment variables
-	scyllaAddress := fmt.Sprintf("%s:%s", os.Getenv("SCYLLA_HOST"), os.Getenv("SCYLLA_PORT"))
-	scylladbCluster := gocql.NewCluster(scyllaAddress)
+	scylladbCluster := gocql.NewCluster(os.Getenv("SCYLLA_HOST"))
 	scylladbCluster.Keyspace = os.Getenv("SCYLLA_KEYSPACE")
+	scylladbCluster.Port, _ = strconv.Atoi(os.Getenv("SCYLLA_PORT"))
 	return scylladbCluster
 }
 

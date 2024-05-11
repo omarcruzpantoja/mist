@@ -25,7 +25,7 @@ services:
       - scylla_data:/var/lib/scylla
       - ./src/scylladb/scripts/initialize.cql:/initialize.cql
     ports:
-      - 9042:9042
+      - 4001:9042
   # user-service-db-scylla2:
   #   image: scylladb/scylla:5.4
   #   restart: always
