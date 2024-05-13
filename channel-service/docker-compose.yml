@@ -24,7 +24,6 @@ services:
     volumes:
       - scylla_data:/var/lib/scylla
       - ./src/scylladb/scripts/initialize.cql:/initialize.cql
-      - 3011:9042
   # channel-service-db-scylla2:
   #   image: scylladb/scylla:5.4
   #   restart: always
