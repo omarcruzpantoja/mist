@@ -8,12 +8,6 @@ ENV PROJECT_DIR=/app \
 
 WORKDIR /app
 
-# install dependencies
-COPY go.mod go.sum /app/
-RUN go mod download
-
-# Copy source code
-COPY ./src ./app/src
 
 # Install migrate for DB migrations
 RUN go install -tags "cassandra" github.com/golang-migrate/migrate/v4/cmd/migrate@${MIGRATE_VERSION}
@@ -23,5 +17,12 @@ RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/i
 
 # For hot reload
 RUN go install -mod=mod github.com/githubnemo/CompileDaemon
+
+
+COPY go.mod go.sum /app/
+RUN go mod download
+
+# Copy source code
+COPY ./src ./app/src
 
 ENTRYPOINT CompileDaemon --build="go build /app/src/main.go" -command="./main -routes=true"

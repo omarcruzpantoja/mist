@@ -15,9 +15,9 @@ func StartService() {
 
 	scyllaCluster := scylladb.InitializeScyllaConnection()
 	scyllaSession, _ := gocqlx.WrapSession(scyllaCluster.CreateSession())
-	defer scyllaSession.Close()
 
 	r := chi.NewRouter()
+
 	// SETUP MIDDDLEWARES
 	r.Use(middleware.Logger)
 	r.Use(middleware.RequestID)

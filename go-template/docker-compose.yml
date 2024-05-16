@@ -1,5 +1,5 @@
 services:
-  user-service-api:
+  go-template-api:
     image: user_service_api
     container_name: ${SERVICE_NAME}-api
     ports:
@@ -16,11 +16,11 @@ services:
       - SCYLLA_PORT=${SCYLLA_PORT}
       - SCYLLA_KEYSPACE=${SCYLLA_KEYSPACE}
 
-  user-service-scylla:
+  go-template-scylla:
     image: scylladb/scylla:5.4
     restart: always
     container_name: ${SERVICE_NAME}-scylla
-    command: --api-address 0.0.0.0
+    command: --api-address 0.0.0.0 -p 4001:9042
     volumes:
       - scylla_data:/var/lib/scylla
       - ./src/scylladb/scripts/initialize.cql:/initialize.cql

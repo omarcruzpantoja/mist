@@ -15,12 +15,14 @@ func InitializeScyllaConnection() *gocql.ClusterConfig {
 	scylladbCluster := gocql.NewCluster(os.Getenv("SCYLLA_HOST"))
 	scylladbCluster.Keyspace = os.Getenv("SCYLLA_KEYSPACE")
 	scylladbCluster.Port, _ = strconv.Atoi(os.Getenv("SCYLLA_PORT"))
+
 	return scylladbCluster
 }
 
 type ScyllaDBSessionKey string
 
 func SetScyllaSession(dbSession *gocqlx.Session) func(next http.Handler) http.Handler {
+
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()

@@ -20,7 +20,7 @@ services:
     image: scylladb/scylla:5.4
     restart: always
     container_name: ${SERVICE_NAME}-scylla
-    command: --api-address 0.0.0.0
+    command: --api-address 0.0.0.0 --smp 1
     volumes:
       - scylla_data:/var/lib/scylla
       - ./src/scylladb/scripts/initialize.cql:/initialize.cql

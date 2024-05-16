@@ -21,6 +21,7 @@ func InitializeScyllaConnection() *gocql.ClusterConfig {
 type ScyllaDBSessionKey string
 
 func SetScyllaSession(dbSession *gocqlx.Session) func(next http.Handler) http.Handler {
+
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
