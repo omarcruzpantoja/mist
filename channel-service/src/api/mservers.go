@@ -21,9 +21,9 @@ func mserverRouter() http.Handler {
 }
 
 func getMServers(w http.ResponseWriter, r *http.Request) {
-	db_session := scylladb.GetScyllaSessionFromContext(r)
+	dbSession := scylladb.GetScyllaSessionFromContext(r)
 	var servers []*models.MServer
-	q := db_session.Query(models.MServerTable.SelectAll())
+	q := dbSession.Query(models.MServerTable.SelectAll())
 	if err := q.SelectRelease(&servers); err != nil {
 		render.Render(w, r, ErrInvalidRequest(err, "database error"))
 	}
@@ -36,7 +36,7 @@ func getMServer(w http.ResponseWriter, r *http.Request) {
 }
 
 func createMServer(w http.ResponseWriter, r *http.Request) {
-	db_session := scylladb.GetScyllaSessionFromContext(r)
+	dbSession := scylladb.GetScyllaSessionFromContext(r)
 	mserver := &models.MServer{}
 	if err := render.Bind(r, mserver); err != nil {
 		render.Render(w, r, ErrInvalidRequest(err, "marshalling error"))
@@ -44,7 +44,7 @@ func createMServer(w http.ResponseWriter, r *http.Request) {
 	}
 	newId, _ := gocql.RandomUUID()
 	mserver.Id = newId
-	q := db_session.Query(models.MServerTable.Insert()).BindStruct(mserver)
+	q := dbSession.Query(models.MServerTable.Insert()).BindStruct(mserver)
 	if err := q.ExecRelease(); err != nil {
 		render.Render(w, r, ErrInvalidRequest(err, "database error"))
 	}

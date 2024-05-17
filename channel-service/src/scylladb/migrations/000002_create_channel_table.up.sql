@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS channel (
     mserverid UUID,
     id UUID,
     name ascii,
-    PRIMARY KEY (mserverid, id, name)
+    PRIMARY KEY (mserverid, id)
 );
