@@ -8,6 +8,7 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/scylladb/gocqlx/v2/qb"
 
+	"channel-service/src/repositories"
 	"channel-service/src/scylladb"
 	"channel-service/src/scylladb/models"
 )
@@ -29,47 +30,50 @@ func createChannel(w http.ResponseWriter, r *http.Request) {
 
 	// Bind body content to the channel variable
 	if err := render.Bind(r, channel); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, "marshalling error"))
+		render.JSON(w, r, ErrInvalidRequest(err, "marshalling error"))
 		return
 	}
 	newId, _ := gocql.RandomUUID()
 	channel.Id = newId
 	q := dbSession.Query(models.ChannelTable.Insert()).BindStruct(channel)
 	if err := q.ExecRelease(); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, "database error"))
+		render.JSON(w, r, ErrInvalidRequest(err, "database error"))
 		return
 	}
-	render.Render(w, r, ChannelHTTPResponse(channel))
+	render.JSON(w, r, channel)
 }
 
 func getChannel(w http.ResponseWriter, r *http.Request) {
-	dbSession := *scylladb.GetScyllaSessionFromContext(r)
+	dbSession := scylladb.GetScyllaSessionFromContext(r)
+	repo := repositories.NewScyllaDBRepo[models.Channel](dbSession)
+
 	channelId, _ := gocql.ParseUUID(chi.URLParam(r, "id"))
 	serverId, _ := gocql.ParseUUID(chi.URLParam(r, "serverId"))
 
 	channel := &models.Channel{Mserverid: serverId, Id: channelId}
 
-	q := dbSession.Query(
-		qb.Select(models.ChannelTable.Name()).Where(qb.Eq("id"), qb.Eq("mserverid")).ToCql(),
-	).BindStruct(channel)
-
-	if err := q.GetRelease(channel); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, "database error"))
+	channel, err := repo.GetByKeys(r.Context(), models.ChannelTable.Name(), channel, 2, "id", "mserverid")
+	if err != nil {
+		render.JSON(w, r, ErrInvalidRequest(err, "database error"))
 		return
 	}
-	render.Render(w, r, ChannelHTTPResponse(channel))
+	render.JSON(w, r, channel)
 }
 
 func getChannels(w http.ResponseWriter, r *http.Request) {
 	dbSession := scylladb.GetScyllaSessionFromContext(r)
 	var channels []*models.Channel
-	q := dbSession.Query(models.ChannelTable.SelectAll())
-	if err := q.SelectRelease(&channels); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, "database error"))
+
+	repo := repositories.NewScyllaDBRepo[models.Channel](dbSession)
+
+	channel := &models.Channel{}
+	channels, err := repo.Filter(r.Context(), models.ChannelTable.Name(), channel, 0)
+	if err != nil {
+		render.JSON(w, r, ErrInvalidRequest(err, "database error"))
 		return
 	}
 
-	render.RenderList(w, r, ChannelListHTTPResponse(channels))
+	render.JSON(w, r, channels)
 }
 
 func patchChannel(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +88,7 @@ func patchChannel(w http.ResponseWriter, r *http.Request) {
 	).BindStruct(channel)
 
 	if err := q.GetRelease(channel); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, "database error"))
+		render.JSON(w, r, ErrInvalidRequest(err, "database error"))
 		return
 	}
 
@@ -92,7 +96,7 @@ func patchChannel(w http.ResponseWriter, r *http.Request) {
 
 	// Bind body content to the channel variable
 	if err := render.Bind(r, channel); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, "marshalling error"))
+		render.JSON(w, r, ErrInvalidRequest(err, "marshalling error"))
 		return
 	}
 
@@ -100,9 +104,9 @@ func patchChannel(w http.ResponseWriter, r *http.Request) {
 		qb.Update(models.ChannelTable.Name()).Set("name").Where(qb.Eq("id"), qb.Eq("mserverid")).ToCql(),
 	).BindStruct(channel)
 	if err := q.ExecRelease(); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, "database error"))
+		render.JSON(w, r, ErrInvalidRequest(err, "database error"))
 	}
-	render.Render(w, r, ChannelHTTPResponse(channel))
+	render.JSON(w, r, channel)
 }
 
 func deleteChannel(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +121,7 @@ func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	).BindStruct(channel)
 
 	if err := q.GetRelease(channel); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, "database error"))
+		render.JSON(w, r, ErrInvalidRequest(err, "database error"))
 		return
 	}
 
@@ -127,7 +131,7 @@ func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	).BindStruct(channel)
 
 	if err := q.ExecRelease(); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, "database error"))
+		render.JSON(w, r, ErrInvalidRequest(err, "database error"))
 		return
 	}
 
@@ -143,17 +147,4 @@ type ChannelResponse struct {
 	// We add an additional field to the response here.. such as this
 	// elapsed computed property
 	Elapsed int64 `json:"elapsed"`
-}
-
-// Marshalers
-func ChannelHTTPResponse(u *models.Channel) *ChannelResponse {
-	return &ChannelResponse{Channel: u}
-}
-
-func ChannelListHTTPResponse(channels []*models.Channel) []render.Renderer {
-	list := []render.Renderer{}
-	for _, server := range channels {
-		list = append(list, ChannelHTTPResponse(server))
-	}
-	return list
 }
