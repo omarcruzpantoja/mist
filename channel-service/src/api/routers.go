@@ -61,10 +61,10 @@ type ErrResponse struct {
 	ErrorText  string `json:"error,omitempty"` // application-level error message, for debugging
 }
 
-func ErrInvalidRequest(err error, message string) render.Renderer {
+func ErrInvalidRequest(code int, err error, message string) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
-		HTTPStatusCode: 400,
+		HTTPStatusCode: code,
 		StatusText:     fmt.Sprintf("Invalid request: %s", message),
 		ErrorText:      err.Error(),
 	}

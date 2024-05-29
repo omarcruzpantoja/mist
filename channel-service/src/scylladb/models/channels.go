@@ -10,17 +10,19 @@ import (
 // metadata specifies table name and columns it must be in sync with schema.
 var ChannelMetadata = table.Metadata{
 	Name:    "channel",
-	Columns: []string{"mserverid", "id", "name"},
-	PartKey: []string{"mserverid"},
+	Columns: []string{"serverid", "id", "name"},
+	PartKey: []string{"serverid"},
 	SortKey: []string{"id", "name"},
 }
 
 var ChannelTable = table.New(ChannelMetadata)
 
+// Schemas
+
 type Channel struct {
-	Mserverid gocql.UUID `json:"mserverid,omitempty" bson:"mserverid,omitempty"`
-	Id        gocql.UUID `json:"id,omitempty" bson:"id,omitempty"`
-	Name      string     `json:"name,omitempty" bson:"name,omitempty"`
+	Serverid gocql.UUID `json:"serverid,omitempty" bson:"serverid,omitempty"`
+	Id       gocql.UUID `json:"id,omitempty" bson:"id,omitempty"`
+	Name     string     `json:"name,omitempty" bson:"name,omitempty"`
 }
 
 /***** HELPERS *****/
