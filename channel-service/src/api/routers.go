@@ -43,7 +43,7 @@ func StartService() {
 
 	// Mount the user router
 	r.Mount("/channels", channelRouter())
-	r.Mount("/mservers", mserverRouter())
+	r.Mount("/servers", serverRouter())
 
 	r.Get("/routes.json", func(w http.ResponseWriter, request *http.Request) {
 		w.Write([]byte(docgen.JSONRoutesDoc(r)))
