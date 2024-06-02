@@ -2,6 +2,7 @@ package models
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/scylladb/gocqlx/v2/table"
@@ -10,7 +11,7 @@ import (
 // metadata specifies table name and columns it must be in sync with schema.
 var ServerMetadata = table.Metadata{
 	Name:    "server",
-	Columns: []string{"id", "name"},
+	Columns: []string{"id", "name", "created_at", "updated_at", "deleted_at"},
 	PartKey: []string{"id"},
 	SortKey: []string{"name"},
 }
@@ -23,16 +24,27 @@ var ServerTable = table.New(ServerMetadata)
 // A field will not be persisted by adding the `db:"-"` tag or making it unexported.
 
 type Server struct {
-	Id   gocql.UUID `json:"id,omitempty" bson:"id,omitempty"`
-	Name string     `json:"name,omitempty" bson:"name,omitempty"`
+	Id        gocql.UUID `json:"id,omitempty"`
+	Name      string     `json:"name,omitempty"`
+	CreatedAt time.Time  `json:"created_at,omitempty"`
+	UpdatedAt time.Time  `json:"updated_at,omitempty"`
+	DeletedAt time.Time  `json:"deleted_at,omitempty"`
 }
 
-func (mistServer *Server) Render(w http.ResponseWriter, r *http.Request) error {
+type ServerCreate struct {
+	Id        gocql.UUID `json:"id,omitempty"`
+	Name      string     `json:"name,omitempty"`
+	CreatedAt time.Time  `json:"created_at,omitempty"`
+	UpdatedAt time.Time  `json:"updated_at,omitempty"`
+	DeletedAt time.Time  `json:"deleted_at,omitempty"`
+}
+
+func (mistServer *Server) Bind(r *http.Request) error {
 	// Pre-processing before a response is marshalled and sent across the wire
 	return nil
 }
 
-func (mistServer *Server) Bind(r *http.Request) error {
+func (mistServer *ServerCreate) Bind(r *http.Request) error {
 	// Pre-processing before a response is marshalled and sent across the wire
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 // metadata specifies table name and columns it must be in sync with schema.
 var ChannelMetadata = table.Metadata{
 	Name:    "channel",
-	Columns: []string{"serverid", "id", "name"},
+	Columns: []string{"serverid", "id", "name", "created_at", "updated_at", "deleted_at"},
 	PartKey: []string{"serverid"},
 	SortKey: []string{"id", "name"},
 }

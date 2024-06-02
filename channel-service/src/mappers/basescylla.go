@@ -5,8 +5,6 @@ import (
 	"github.com/scylladb/gocqlx/v2/qb"
 
 	"context"
-
-	"channel-service/src/scylladb/models"
 )
 
 // ** scylladb repo definition **
@@ -14,11 +12,6 @@ type ScyllaDBMapper[T any] struct {
 	dbSession *gocqlx.Session
 	ctx       context.Context
 	tableName string
-}
-
-func (m *ScyllaDBMapper[T]) Create(item *T) error {
-	q := m.dbSession.Query(models.ChannelTable.Insert()).BindStruct(item)
-	return q.ExecRelease()
 }
 
 func (m *ScyllaDBMapper[T]) GetByKeys(
@@ -67,7 +60,7 @@ func (m *ScyllaDBMapper[T]) Patch(item *T, setCount, columnTitleSet []string, ke
 		comparisons[index] = qb.Eq(key)
 	}
 	q := m.dbSession.Query(
-		qb.Update(models.ChannelTable.Name()).Set(columnTitleSet...).Where(comparisons...).ToCql(),
+		qb.Update(m.tableName).Set(columnTitleSet...).Where(comparisons...).ToCql(),
 	).BindStruct(item)
 
 	return q.ExecRelease()
@@ -88,7 +81,7 @@ func (m *ScyllaDBMapper[T]) Delete(
 
 	// Confirmed channel exists, continue with the delete
 	q := m.dbSession.Query(
-		qb.Delete(models.ChannelTable.Name()).Where(comparisons...).ToCql(),
+		qb.Delete(m.tableName).Where(comparisons...).ToCql(),
 	).BindStruct(item)
 
 	return q.ExecRelease()
