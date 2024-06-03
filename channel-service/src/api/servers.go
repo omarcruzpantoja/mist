@@ -108,6 +108,7 @@ func deleteServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: Add ability to soft delete a server
 	// TODO: Delete all subscriptions to a server
 	// TODO: Delete all channels
 	w.WriteHeader(http.StatusNoContent) // send the headers with a 204 response code.

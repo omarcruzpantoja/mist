@@ -16,10 +16,10 @@ import (
 func channelRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", createChannel)
-	r.Get("/{id}/server/{serverid}", getChannel)
+	r.Get("/{id}/server/{server_id}", getChannel)
 	r.Get("/", getChannels)
-	r.Patch("/{id}/server/{serverid}", patchChannel)
-	r.Delete("/{id}/server/{serverid}", deleteChannel)
+	r.Patch("/{id}/server/{server_id}", patchChannel)
+	r.Delete("/{id}/server/{server_id}", deleteChannel)
 	return r
 }
 
@@ -48,11 +48,11 @@ func getChannel(w http.ResponseWriter, r *http.Request) {
 	channelService := mappers.BaseChannelService(dbSession, r.Context())
 
 	channelId, _ := gocql.ParseUUID(chi.URLParam(r, "id"))
-	serverId, _ := gocql.ParseUUID(chi.URLParam(r, "serverid"))
+	serverId, _ := gocql.ParseUUID(chi.URLParam(r, "server_id"))
 
-	channel := &models.Channel{Serverid: serverId, Id: channelId}
+	channel := &models.Channel{ServerId: serverId, Id: channelId}
 
-	err := channelService.GetByKeys(channel, 2, "id", "serverid")
+	err := channelService.GetByKeys(channel, 2, "id", "server_id")
 	if err != nil {
 		render.JSON(w, r, ErrInvalidRequest(404, err, "database error"))
 		return
@@ -78,10 +78,10 @@ func getChannels(w http.ResponseWriter, r *http.Request) {
 func patchChannel(w http.ResponseWriter, r *http.Request) {
 	dbSession := scylladb.GetScyllaSessionFromContext(r)
 	channelId, _ := gocql.ParseUUID(chi.URLParam(r, "id"))
-	serverId, _ := gocql.ParseUUID(chi.URLParam(r, "serverid"))
+	serverId, _ := gocql.ParseUUID(chi.URLParam(r, "server_id"))
 	channelService := mappers.ChannelService(dbSession, r.Context())
 
-	channel := &models.Channel{Serverid: serverId, Id: channelId}
+	channel := &models.Channel{ServerId: serverId, Id: channelId}
 
 	// Bind body content to the channel variable
 	if err := render.Bind(r, channel); err != nil {
@@ -93,24 +93,25 @@ func patchChannel(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, ErrInvalidRequest(400, err, "database error"))
 		return
 	}
-	render.JSON(w, r, channel)
+	render.JSON(w, r, &channel)
 }
 
 func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	dbSession := scylladb.GetScyllaSessionFromContext(r)
 
 	channelId, _ := gocql.ParseUUID(chi.URLParam(r, "id"))
-	serverId, _ := gocql.ParseUUID(chi.URLParam(r, "serverid"))
-	channel := &models.Channel{Serverid: serverId, Id: channelId}
+	serverId, _ := gocql.ParseUUID(chi.URLParam(r, "server_id"))
+	channel := &models.Channel{ServerId: serverId, Id: channelId}
 
 	channelService := mappers.BaseChannelService(dbSession, r.Context())
 
-	err := channelService.Delete(channel, 2, "id", "serverid")
+	err := channelService.Delete(channel, 2, "id", "server_id")
 	if err != nil {
 		render.JSON(w, r, ErrInvalidRequest(400, err, "database error"))
 		return
 	}
 
+	// TODO: Add ability to soft delete a server
 	// TODO: Delete all subscriptions to a channel
 	w.WriteHeader(http.StatusNoContent) // send the headers with a 204 response code.
 }

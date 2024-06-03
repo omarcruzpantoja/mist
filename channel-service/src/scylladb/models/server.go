@@ -11,7 +11,7 @@ import (
 // metadata specifies table name and columns it must be in sync with schema.
 var ServerMetadata = table.Metadata{
 	Name:    "server",
-	Columns: []string{"id", "name", "created_at", "updated_at", "deleted_at"},
+	Columns: []string{"id", "name", "created_at", "updated_at"},
 	PartKey: []string{"id"},
 	SortKey: []string{"name"},
 }
@@ -28,7 +28,6 @@ type Server struct {
 	Name      string     `json:"name,omitempty"`
 	CreatedAt time.Time  `json:"created_at,omitempty"`
 	UpdatedAt time.Time  `json:"updated_at,omitempty"`
-	DeletedAt time.Time  `json:"deleted_at,omitempty"`
 }
 
 type ServerCreate struct {
@@ -36,7 +35,6 @@ type ServerCreate struct {
 	Name      string     `json:"name,omitempty"`
 	CreatedAt time.Time  `json:"created_at,omitempty"`
 	UpdatedAt time.Time  `json:"updated_at,omitempty"`
-	DeletedAt time.Time  `json:"deleted_at,omitempty"`
 }
 
 func (mistServer *Server) Bind(r *http.Request) error {

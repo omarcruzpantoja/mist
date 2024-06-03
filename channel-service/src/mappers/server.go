@@ -32,7 +32,6 @@ func (m *ServerScyllaMapper) Create(item *models.ServerCreate) error {
 	currentTime := time.Now().UTC()
 	item.CreatedAt = currentTime
 	item.UpdatedAt = currentTime
-	item.DeletedAt = currentTime
 
 	// TODO: Add check that server exists
 	q := m.dbSession.Query(models.ServerTable.Insert()).BindStruct(item)
@@ -48,10 +47,12 @@ func (m *ServerScyllaMapper) Patch(item *models.Server) error {
 		return err
 	}
 
+	item.UpdatedAt = time.Now().UTC()
+	item.CreatedAt = resource.CreatedAt
 	q := m.dbSession.Query(
 		qb.
 			Update(models.ServerTable.Name()).
-			Set("name").
+			Set("name", "updated_at").
 			Where(qb.Eq("id")).ToCql(),
 	).BindStruct(item)
 

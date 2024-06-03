@@ -2,6 +2,7 @@ package models
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/scylladb/gocqlx/v2/table"
@@ -10,8 +11,8 @@ import (
 // metadata specifies table name and columns it must be in sync with schema.
 var ChannelMetadata = table.Metadata{
 	Name:    "channel",
-	Columns: []string{"serverid", "id", "name", "created_at", "updated_at", "deleted_at"},
-	PartKey: []string{"serverid"},
+	Columns: []string{"server_id", "id", "name", "created_at", "updated_at"},
+	PartKey: []string{"server_id"},
 	SortKey: []string{"id", "name"},
 }
 
@@ -20,9 +21,11 @@ var ChannelTable = table.New(ChannelMetadata)
 // Schemas
 
 type Channel struct {
-	Serverid gocql.UUID `json:"serverid,omitempty" bson:"serverid,omitempty"`
-	Id       gocql.UUID `json:"id,omitempty" bson:"id,omitempty"`
-	Name     string     `json:"name,omitempty" bson:"name,omitempty"`
+	ServerId  gocql.UUID `json:"server_id,omitempty"`
+	Id        gocql.UUID `json:"id,omitempty"`
+	Name      string     `json:"name,omitempty"`
+	CreatedAt time.Time  `json:"created_at,omitempty"`
+	UpdatedAt time.Time  `json:"updated_at,omitempty"`
 }
 
 /***** HELPERS *****/

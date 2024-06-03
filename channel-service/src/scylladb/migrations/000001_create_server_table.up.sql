@@ -4,6 +4,5 @@ CREATE TABLE IF NOT EXISTS server (
     name ascii,
     created_at timestamp,
     updated_at timestamp,
-    deleted_at timestamp,
     PRIMARY KEY (id)
 );
