@@ -40,9 +40,12 @@ const ServerScreen = (): JSX.Element => {
   return (
     <div style={{ margin: "25px" }}>
       {servers.map((server) => {
-        return <ServerLink server={server} />;
+        return (
+          <Accordion key={server.id} header={<div>{server.name}</div>}>
+            hi
+          </Accordion>
+        );
       })}
-      <Accordion header={<div>test</div>}>hi</Accordion>
     </div>
   );
 };

@@ -22,8 +22,12 @@ const Accordion = ({
         <Button onClick={() => setIsOpen(!isOpen)}>{isOpen ? "-" : "+"}</Button>
         {header}
       </div>
-      {isOpen && <Divider />}
-      {children}
+      {isOpen && (
+        <>
+          <Divider />
+          {children}
+        </>
+      )}
     </div>
   );
 };
