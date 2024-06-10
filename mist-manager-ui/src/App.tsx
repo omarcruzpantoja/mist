@@ -1,7 +1,7 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./App.scss";
 import { Base } from "./shared";
-import { HomeScreen, ServerScreen } from "./components";
+import { HomeScreen, ServerScreen, ChannelScreen } from "./components";
 
 const router = createBrowserRouter([
   {
@@ -15,6 +15,10 @@ const router = createBrowserRouter([
       {
         path: "/servers",
         element: <ServerScreen />,
+      },
+      {
+        path: "/channels",
+        element: <ChannelScreen />,
       },
     ],
   },
