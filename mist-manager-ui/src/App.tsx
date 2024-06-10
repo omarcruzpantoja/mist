@@ -17,7 +17,7 @@ const router = createBrowserRouter([
         element: <ServerScreen />,
       },
       {
-        path: "/channels",
+        path: "/servers/:serverId/channels",
         element: <ChannelScreen />,
       },
     ],
