@@ -14,6 +14,7 @@ require (
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
+	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
 	github.com/scylladb/go-reflectx v1.0.1 // indirect
